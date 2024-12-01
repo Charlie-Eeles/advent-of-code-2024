@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn main() {
     let input = include_str!("../input.txt");
     let mut current_number = String::new();
@@ -22,17 +24,17 @@ fn main() {
             in_left_column = !in_left_column;
         }
     }
-    left_col_vec.sort();
-    right_col_vec.sort();
 
-    let mut difference: u32 = 0;
-    for idx in 0..left_col_vec.len() {
-        let left = left_col_vec.get(idx);
-        let right = right_col_vec.get(idx);
-        let max = left.max(right).unwrap();
-        let min = left.min(right).unwrap();
-        difference += max - min;
+    let mut right_col_frequency = HashMap::new();
+    for num in right_col_vec.iter() {
+        *right_col_frequency.entry(num).or_insert(0) += 1;
     }
 
-    println!("Difference: {difference}");
+    let mut similarity: u32 = 0;
+    for num in left_col_vec.iter() {
+        let frequency = right_col_frequency.get(num).unwrap_or(&0);
+        similarity += num * frequency;
+    }
+
+    println!("Similarity score: {}", similarity);
 }
