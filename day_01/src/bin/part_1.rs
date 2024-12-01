@@ -1,38 +1,28 @@
+use std::iter::zip;
+
 fn main() {
     let input = include_str!("../input.txt");
-    let mut current_number = String::new();
+    let mut left_col_vec = Vec::new();
+    let mut right_col_vec = Vec::new();
 
-    let mut in_left_column = true;
-    let mut left_col_vec: Vec<u32> = Vec::new();
-    let mut right_col_vec: Vec<u32> = Vec::new();
-
-    for char in input.chars() {
-        if char.is_ascii_digit() {
-            current_number.push(char);
-        } else if current_number.is_empty() {
-            continue;
-        } else {
-            let complete_number = current_number.parse::<u32>().unwrap();
-            if in_left_column {
-                left_col_vec.push(complete_number);
+    input
+        .split_whitespace()
+        .enumerate()
+        .for_each(|(idx, str_num)| {
+            let num: u32 = str_num.parse().unwrap();
+            if idx % 2 == 0 {
+                left_col_vec.push(num);
             } else {
-                right_col_vec.push(complete_number);
+                right_col_vec.push(num);
             }
-            current_number = String::new();
-            in_left_column = !in_left_column;
-        }
-    }
+        });
+
     left_col_vec.sort();
     right_col_vec.sort();
 
-    let mut difference: u32 = 0;
-    for idx in 0..left_col_vec.len() {
-        let left = left_col_vec.get(idx);
-        let right = right_col_vec.get(idx);
-        let max = left.max(right).unwrap();
-        let min = left.min(right).unwrap();
-        difference += max - min;
-    }
+    let difference: u32 = zip(left_col_vec.iter(), right_col_vec.iter())
+        .map(|(left_col, right_col)| (left_col.max(right_col) - left_col.min(right_col)))
+        .sum();
 
     println!("Difference: {difference}");
 }
